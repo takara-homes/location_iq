@@ -1,28 +1,16 @@
-// lib/src/services/reverse_geocoding/i_reverse_geocoding_service.dart
-
-// lib/src/services/reverse_geocoding/reverse_geocoding_service.dart
-import 'dart:convert';
 import 'package:http/http.dart' show Client;
 import 'package:location_iq/src/config/api_config.dart';
-import 'package:location_iq/src/core/error/error_handler.dart';
+import 'package:location_iq/src/core/base/base_service.dart';
 import 'package:location_iq/src/core/error/exceptions.dart';
-import 'package:location_iq/src/core/http/http_client.dart';
-import 'package:location_iq/src/core/http/http_status.dart';
 import 'package:location_iq/src/models/geocoding/reverse_result.dart';
 
-class ReverseGeocodingService {
-  final String apiKey;
-  final String baseUrl;
-  final LocationIQHttpClient _httpClient;
-
+class ReverseGeocodingService extends BaseLocationIQService {
   ReverseGeocodingService({
-    required this.apiKey,
-    required this.baseUrl,
+    required super.apiKey,
+    required super.baseUrl,
     Client? httpClient,
-  }) : _httpClient = LocationIQHttpClient(
-          client: httpClient,
-          timeout: const Duration(seconds: 30),
-        );
+    Duration? timeout,
+  }) : super(httpClient: httpClient, timeout: timeout);
 
   Future<LocationIQReverseResult> reverseGeocode({
     required String lat,
@@ -37,73 +25,79 @@ class ReverseGeocodingService {
     String? showAlternativeNames,
     String? callback,
   }) async {
-    try {
-      final uri = _buildUri(
-        lat: lat,
-        lon: lon,
-        format: format,
-        language: language,
-        normalizeCity: normalizeCity,
-        addressDetails: addressDetails,
-        nameDetails: nameDetails,
-        extraTags: extraTags,
-        statecode: statecode,
-        showAlternativeNames: showAlternativeNames,
-        callback: callback,
-      );
+    // Parameter validation
+    validateCoordinate(lat, lon);
+    validateStringParameter(language, 'language', maxLength: 10);
+    validateStringParameter(normalizeCity, 'normalizeCity', maxLength: 10);
+    validateNumericParameter(addressDetails, 'addressDetails', min: 0, max: 1);
+    validateNumericParameter(nameDetails, 'nameDetails', min: 0, max: 1);
+    validateNumericParameter(extraTags, 'extraTags', min: 0, max: 1);
+    validateNumericParameter(statecode, 'statecode', min: 0, max: 1);
 
-      final response = await _httpClient.get(
-        uri,
-        headers: ApiConfig.defaultHeaders,
-      );
-
-      if (HttpStatus.isSuccessful(response.statusCode)) {
-        return _parseResponse(response.body);
-      }
-
-      ErrorHandler.handleErrorResponse(response);
-      throw UnexpectedException('Unexpected error occurred');
-    } on FormatException catch (e) {
-      throw UnexpectedException('Invalid response format: ${e.toString()}');
-    }
-  }
-
-  Uri _buildUri({
-    required String lat,
-    required String lon,
-    String? format,
-    String? language,
-    String? normalizeCity,
-    int? addressDetails,
-    int? nameDetails,
-    int? extraTags,
-    int? statecode,
-    String? showAlternativeNames,
-    String? callback,
-  }) {
     final queryParams = {
       'key': apiKey,
       'lat': lat,
       'lon': lon,
       'format': format ?? ApiConfig.defaultFormat,
-      if (language != null) 'accept-language': language,
-      if (normalizeCity != null) 'normalizecity': normalizeCity,
-      if (addressDetails != null) 'addressdetails': addressDetails.toString(),
-      if (nameDetails != null) 'namedetails': nameDetails.toString(),
-      if (extraTags != null) 'extratags': extraTags.toString(),
-      if (statecode != null) 'statecode': statecode.toString(),
-      if (showAlternativeNames != null)
-        'show_alternative_names': showAlternativeNames,
-      if (callback != null) 'callback': callback,
+      'accept-language': language ?? ApiConfig.defaultLanguage,
+      'normalizecity': normalizeCity,
+      'addressdetails': addressDetails ?? ApiConfig.defaultAddressDetails,
+      'namedetails': nameDetails,
+      'extratags': extraTags,
+      'statecode': statecode,
+      'show_alternative_names': showAlternativeNames,
+      'callback': callback,
     };
 
-    return Uri.parse('$baseUrl/reverse').replace(
-      queryParameters: queryParams,
-    );
+    final uri = buildUri('/reverse', queryParams);
+    final response = await makeRequest(uri);
+    return parseObjectResponse(response.body, LocationIQReverseResult.fromJson);
   }
 
-  LocationIQReverseResult _parseResponse(String responseBody) {
-    final json = jsonDecode(responseBody) as Map<String, dynamic>;
-    return LocationIQReverseResult.fromJson(json);
+  /// Convenience method that provides the same interface as other services
+  Future<LocationIQReverseResult> search({
+    required String lat,
+    required String lon,
+    int? zoom,
+    int? addressDetails,
+    bool? extratags,
+    bool? namedetails,
+    String? acceptLanguage,
+    Map<String, dynamic>? additionalOptions,
+  }) async {
+    // Validate coordinates
+    validateCoordinate(lat, lon);
+    validateNumericParameter(zoom, 'zoom', min: 0, max: 18);
+    validateNumericParameter(addressDetails, 'addressDetails', min: 0, max: 1);
+
+    final parameters = <String, dynamic>{
+      'key': apiKey,
+      'lat': lat,
+      'lon': lon,
+      'format': 'json',
+      if (zoom != null) 'zoom': zoom,
+      if (addressDetails != null) 'addressdetails': addressDetails,
+      if (extratags != null) 'extratags': extratags ? '1' : '0',
+      if (namedetails != null) 'namedetails': namedetails ? '1' : '0',
+      if (acceptLanguage != null) 'accept-language': acceptLanguage,
+      ...?additionalOptions,
+    };
+
+    try {
+      final uri = buildUri('/reverse', parameters);
+      final response = await makeRequest(uri);
+
+      return parseObjectResponse<LocationIQReverseResult>(
+        response.body,
+        (json) => LocationIQReverseResult.fromJson(json),
+      );
+    } catch (e) {
+      if (e is LocationIQException) {
+        rethrow;
+      }
+      throw UnexpectedException(
+        'Failed to perform reverse geocoding: ${e.toString()}',
+      );
+    }
   }
 }

@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String baseUrl = 'https://api.locationiq.com/v1';
+  static const String baseUrl = 'https://us1.locationiq.com/v1';
   static const int defaultTimeout = 30000; // milliseconds
   static const Map<String, String> defaultHeaders = {
     'Accept': 'application/json',

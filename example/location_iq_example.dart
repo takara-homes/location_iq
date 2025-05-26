@@ -2,9 +2,7 @@ import 'package:location_iq/location_iq.dart';
 import 'package:location_iq/src/core/error/exceptions.dart';
 
 void main() async {
-  final client = LocationIQClient(
-    apiKey: 'your_api_key_here',
-  );
+  final client = LocationIQClient(apiKey: 'your_api_key_here');
 
   try {
     // Free-form Forward Geocoding Example
@@ -12,7 +10,6 @@ void main() async {
     final locations = await client.forwardFreeform.search(
       query: 'Buckingham Palace, London',
       limit: 1,
-      acceptLanguage: 'en',
     );
 
     if (locations.isNotEmpty) {

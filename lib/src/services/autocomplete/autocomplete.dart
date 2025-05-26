@@ -1,25 +1,14 @@
-import 'dart:convert';
 import 'package:http/http.dart' show Client;
-import 'package:location_iq/src/config/api_config.dart';
-import 'package:location_iq/src/core/error/error_handler.dart';
+import 'package:location_iq/src/core/base/base_service.dart';
 import 'package:location_iq/src/core/error/exceptions.dart';
-import 'package:location_iq/src/core/http/http_client.dart';
-import 'package:location_iq/src/core/http/http_status.dart';
 import 'package:location_iq/src/models/geocoding/autocomplete_result.dart';
 
-class AutocompleteService {
-  final String apiKey;
-  final String baseUrl;
-  final LocationIQHttpClient _httpClient;
-
+class AutocompleteService extends BaseLocationIQService {
   AutocompleteService({
-    required this.apiKey,
-    required this.baseUrl,
+    required String apiKey,
+    required String baseUrl,
     Client? httpClient,
-  }) : _httpClient = LocationIQHttpClient(
-          client: httpClient,
-          timeout: const Duration(seconds: 30),
-        );
+  }) : super(apiKey: apiKey, baseUrl: baseUrl, httpClient: httpClient);
 
   Future<List<LocationIQAutocompleteResult>> suggest({
     required String query,
@@ -33,81 +22,43 @@ class AutocompleteService {
     int? addressDetails,
     Map<String, dynamic>? additionalOptions,
   }) async {
-    try {
-      final uri = _buildUri(
-        query: query,
-        countryCode: countryCode,
-        limit: limit,
-        viewBox: viewBox,
-        bounded: bounded,
-        tag: tag,
-        language: language,
-        dedupe: dedupe,
-        addressDetails: addressDetails,
-        additionalOptions: additionalOptions,
-      );
+    // Validate query parameter
+    validateStringParameter(query, 'query', maxLength: 200);
 
-      final response = await _httpClient.get(
-        uri,
-        headers: ApiConfig.defaultHeaders,
-      );
+    // Validate numeric parameters
+    validateNumericParameter(limit, 'limit', min: 1, max: 50);
+    validateNumericParameter(addressDetails, 'addressDetails', min: 0, max: 1);
 
-      if (HttpStatus.isSuccessful(response.statusCode)) {
-        return _parseResponse(response.body);
-      }
-
-      ErrorHandler.handleErrorResponse(response);
-      throw UnexpectedException('Unexpected error occurred');
-    } on FormatException catch (e) {
-      throw UnexpectedException('Invalid response format: ${e.toString()}');
-    }
-  }
-
-  Uri _buildUri({
-    required String query,
-    String? countryCode,
-    int? limit,
-    String? viewBox,
-    bool? bounded,
-    String? tag,
-    String? language,
-    String? dedupe,
-    int? addressDetails,
-    Map<String, dynamic>? additionalOptions,
-  }) {
-    final queryParams = {
+    final parameters = <String, dynamic>{
       'key': apiKey,
-      'q': query,
-      'format': ApiConfig.defaultFormat,
+      'q': query.trim(),
+      'format': 'json',
       if (countryCode != null) 'countrycodes': countryCode,
-      if (limit != null) 'limit': limit.toString(),
+      if (limit != null) 'limit': limit,
       if (viewBox != null) 'viewbox': viewBox,
       if (bounded != null) 'bounded': bounded ? '1' : '0',
       if (tag != null) 'tag': tag,
       if (language != null) 'accept-language': language,
       if (dedupe != null) 'dedupe': dedupe,
-      if (addressDetails != null) 'addressdetails': addressDetails.toString(),
+      if (addressDetails != null) 'addressdetails': addressDetails,
+      ...?additionalOptions,
     };
 
-    // Add any additional options if provided
-    if (additionalOptions != null) {
-      additionalOptions.forEach((key, value) {
-        if (value != null) {
-          queryParams[key] = value.toString();
-        }
-      });
+    try {
+      final uri = buildUri('/autocomplete', parameters);
+      final response = await makeRequest(uri);
+
+      return parseListResponse<LocationIQAutocompleteResult>(
+        response.body,
+        (json) => LocationIQAutocompleteResult.fromJson(json),
+      );
+    } catch (e) {
+      if (e is LocationIQException) {
+        rethrow;
+      }
+      throw UnexpectedException(
+        'Failed to perform autocomplete: ${e.toString()}',
+      );
     }
-
-    return Uri.parse('$baseUrl/autocomplete').replace(
-      queryParameters: queryParams,
-    );
-  }
-
-  List<LocationIQAutocompleteResult> _parseResponse(String responseBody) {
-    final List<dynamic> jsonList = json.decode(responseBody) as List;
-    return jsonList
-        .map((json) =>
-            LocationIQAutocompleteResult.fromJson(json as Map<String, dynamic>))
-        .toList();
   }
 }

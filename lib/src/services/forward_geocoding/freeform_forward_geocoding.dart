@@ -1,83 +1,85 @@
-import 'dart:convert';
-
-import 'package:http/http.dart';
-import 'package:location_iq/src/config/api_config.dart';
-import 'package:location_iq/src/core/error/error_handler.dart';
+import 'package:http/http.dart' show Client;
+import 'package:location_iq/src/core/base/base_service.dart';
 import 'package:location_iq/src/core/error/exceptions.dart';
-import 'package:location_iq/src/core/http/http_client.dart';
-import 'package:location_iq/src/core/http/http_status.dart';
-import 'package:location_iq/src/core/http/request_builder.dart';
 import 'package:location_iq/src/models/geocoding/forward_geocoding_result.dart';
 
-class FreeFormForwardGeocodingService {
-  final String apiKey;
-  final String baseUrl;
-  final LocationIQHttpClient _httpClient;
-
+class FreeFormForwardGeocodingService extends BaseLocationIQService {
   FreeFormForwardGeocodingService({
-    required this.apiKey,
-    required this.baseUrl,
+    required String apiKey,
+    required String baseUrl,
     Client? httpClient,
-  }) : _httpClient = LocationIQHttpClient(
-          client: httpClient,
-          timeout: const Duration(seconds: 30),
-        );
+    Duration? timeout,
+  }) : super(
+         apiKey: apiKey,
+         baseUrl: baseUrl,
+         httpClient: httpClient,
+         timeout: timeout,
+       );
 
   Future<List<ForwardGeocodingResult>> search({
     required String query,
-    String? format,
-    int? addressdetails,
     int? limit,
-    String? acceptLanguage,
-    String? countrycodes,
-    String? viewbox,
-    int? bounded,
-    int? dedupe,
-    int? normalizeaddress,
-    int? normalizecity,
-    String? jsonCallback,
+    String? viewBox,
+    bool? bounded,
+    int? addressDetails,
+    bool? normalizecity,
+    bool? extratags,
+    bool? namedetails,
+    bool? dedupe,
+    String? email,
+    Map<String, dynamic>? additionalOptions,
   }) async {
-    try {
-      final uri = RequestBuilder.buildSearchUri(
-        baseUrl,
-        apiKey,
-        query: query,
-        format: format,
-        addressdetails: addressdetails,
-        limit: limit,
-        acceptLanguage: acceptLanguage,
-        countrycodes: countrycodes,
-        viewbox: viewbox,
-        bounded: bounded,
-        dedupe: dedupe,
-        normalizeaddress: normalizeaddress,
-        normalizecity: normalizecity,
-        jsonCallback: jsonCallback,
-      );
+    // Parameter validation
+    validateStringParameter(query, 'query', maxLength: 300);
+    validateNumericParameter(limit, 'limit', min: 1, max: 50);
+    validateNumericParameter(addressDetails, 'addressDetails', min: 0, max: 1);
 
-      final response = await _httpClient.get(
-        uri,
-        headers: ApiConfig.defaultHeaders,
-      );
-
-      if (HttpStatus.isSuccessful(response.statusCode)) {
-        return _parseResponse(response.body);
+    // Validate viewbox format if provided
+    if (viewBox != null && viewBox.isNotEmpty) {
+      final parts = viewBox.split(',');
+      if (parts.length != 4) {
+        throw ArgumentError(
+          'Viewbox must contain exactly 4 comma-separated values',
+        );
       }
-
-      ErrorHandler.handleErrorResponse(response);
-
-      // This line will never be reached due to error handling
-      throw UnexpectedException('Unexpected error occurred');
-    } on FormatException catch (e) {
-      throw UnexpectedException('Invalid response format: ${e.toString()}');
+      for (final part in parts) {
+        if (double.tryParse(part) == null) {
+          throw ArgumentError('Viewbox coordinates must be valid numbers');
+        }
+      }
     }
-  }
 
-  /// Parses the response body into a list of ForwardGeocodingResult objects
-  List<ForwardGeocodingResult> _parseResponse(String responseBody) {
-    final List<dynamic> jsonList = json.decode(responseBody);
-    return jsonList
-        .map((json) => ForwardGeocodingResult.fromJson(json))
-        .toList();
+    final parameters = <String, dynamic>{
+      'key': apiKey,
+      'q': query.trim(),
+      'format': 'json',
+      if (limit != null) 'limit': limit,
+      if (viewBox != null) 'viewbox': viewBox,
+      if (bounded != null) 'bounded': bounded ? '1' : '0',
+      if (addressDetails != null) 'addressdetails': addressDetails,
+      if (normalizecity != null) 'normalizecity': normalizecity ? '1' : '0',
+      if (extratags != null) 'extratags': extratags ? '1' : '0',
+      if (namedetails != null) 'namedetails': namedetails ? '1' : '0',
+      if (dedupe != null) 'dedupe': dedupe ? '1' : '0',
+      if (email != null) 'email': email,
+      ...?additionalOptions,
+    };
+
+    try {
+      final uri = buildUri('/search', parameters);
+      final response = await makeRequest(uri);
+
+      return parseListResponse<ForwardGeocodingResult>(
+        response.body,
+        (json) => ForwardGeocodingResult.fromJson(json),
+      );
+    } catch (e) {
+      if (e is LocationIQException) {
+        rethrow;
+      }
+      throw UnexpectedException(
+        'Failed to perform forward geocoding: ${e.toString()}',
+      );
+    }
   }
 }

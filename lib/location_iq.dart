@@ -1,5 +1,6 @@
 library location_iq;
 
+import 'package:location_iq/src/config/api_config.dart';
 import 'package:location_iq/src/services/autocomplete/autocomplete.dart';
 import 'package:location_iq/src/services/forward_geocoding/freeform_forward_geocoding.dart';
 
@@ -14,53 +15,61 @@ class LocationIQClient {
   final String apiKey;
   final String baseUrl;
 
-  LocationIQClient({
-    required this.apiKey,
-    this.baseUrl = 'https://us1.locationiq.com/v1',
-  });
+  // Cached service instances
+  FreeFormForwardGeocodingService? _forwardFreeform;
+  StructuredGeocodingService? _forwardStructured;
+  PostalCodeService? _forwardPostalcode;
+  AutocompleteService? _autocomplete;
+  ReverseGeocodingService? _reverse;
+
+  LocationIQClient({required this.apiKey, this.baseUrl = ApiConfig.baseUrl});
 
   /// Free-form forward geocoding service
   FreeFormForwardGeocodingService get forwardFreeform {
-    final forwardGeocodingService = FreeFormForwardGeocodingService(
+    return _forwardFreeform ??= FreeFormForwardGeocodingService(
       apiKey: apiKey,
       baseUrl: baseUrl,
     );
-    return forwardGeocodingService;
   }
 
   /// Structured geocoding service
   StructuredGeocodingService get forwardStructured {
-    final structuredGeocodingService = StructuredGeocodingService(
+    return _forwardStructured ??= StructuredGeocodingService(
       apiKey: apiKey,
       baseUrl: baseUrl,
     );
-    return structuredGeocodingService;
   }
 
   /// Postal code search service
   PostalCodeService get forwardPostalcode {
-    final postalCodeService = PostalCodeService(
+    return _forwardPostalcode ??= PostalCodeService(
       apiKey: apiKey,
       baseUrl: baseUrl,
     );
-    return postalCodeService;
   }
 
   /// Autocomplete suggestion service
   AutocompleteService get autocomplete {
-    final autocompleteService = AutocompleteService(
+    return _autocomplete ??= AutocompleteService(
       apiKey: apiKey,
       baseUrl: baseUrl,
     );
-    return autocompleteService;
   }
 
   /// Reverse geocoding service
   ReverseGeocodingService get reverse {
-    final reverseGeocodingService = ReverseGeocodingService(
+    return _reverse ??= ReverseGeocodingService(
       apiKey: apiKey,
       baseUrl: baseUrl,
     );
-    return reverseGeocodingService;
+  }
+
+  /// Disposes all cached services and their resources
+  void dispose() {
+    _forwardFreeform?.dispose();
+    _forwardStructured?.dispose();
+    _forwardPostalcode?.dispose();
+    _autocomplete?.dispose();
+    _reverse?.dispose();
   }
 }
