@@ -2,11 +2,14 @@ library location_iq;
 
 import 'package:location_iq/src/config/api_config.dart';
 import 'package:location_iq/src/services/autocomplete/autocomplete.dart';
+import 'package:location_iq/src/services/balance/balance_service.dart';
 import 'package:location_iq/src/services/forward_geocoding/freeform_forward_geocoding.dart';
-
 import 'package:location_iq/src/services/forward_geocoding/postal_code_forward_geocoding.dart';
 import 'package:location_iq/src/services/forward_geocoding/structured_forward_geocoding.dart';
+import 'package:location_iq/src/services/nearby/nearby_poi_service.dart';
 import 'package:location_iq/src/services/reverse_geocoding/reverse_geocoding.dart';
+import 'package:location_iq/src/services/routing/directions_service.dart';
+import 'package:location_iq/src/services/timezone/timezone_service.dart';
 
 export 'src/models/models.dart';
 
@@ -21,6 +24,10 @@ class LocationIQClient {
   PostalCodeService? _forwardPostalcode;
   AutocompleteService? _autocomplete;
   ReverseGeocodingService? _reverse;
+  NearbyPOIService? _nearbyPOI;
+  TimezoneService? _timezone;
+  DirectionsService? _directions;
+  BalanceService? _balance;
 
   LocationIQClient({required this.apiKey, this.baseUrl = ApiConfig.baseUrl});
 
@@ -64,6 +71,26 @@ class LocationIQClient {
     );
   }
 
+  /// Nearby points of interest service
+  NearbyPOIService get nearbyPOI {
+    return _nearbyPOI ??= NearbyPOIService(apiKey: apiKey, baseUrl: baseUrl);
+  }
+
+  /// Timezone information service
+  TimezoneService get timezone {
+    return _timezone ??= TimezoneService(apiKey: apiKey, baseUrl: baseUrl);
+  }
+
+  /// Directions and routing service
+  DirectionsService get directions {
+    return _directions ??= DirectionsService(apiKey: apiKey, baseUrl: baseUrl);
+  }
+
+  /// Account balance and usage service
+  BalanceService get balance {
+    return _balance ??= BalanceService(apiKey: apiKey, baseUrl: baseUrl);
+  }
+
   /// Disposes all cached services and their resources
   void dispose() {
     _forwardFreeform?.dispose();
@@ -71,5 +98,9 @@ class LocationIQClient {
     _forwardPostalcode?.dispose();
     _autocomplete?.dispose();
     _reverse?.dispose();
+    _nearbyPOI?.dispose();
+    _timezone?.dispose();
+    _directions?.dispose();
+    _balance?.dispose();
   }
 }

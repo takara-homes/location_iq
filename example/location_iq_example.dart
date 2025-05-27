@@ -65,6 +65,75 @@ void main() async {
     for (final suggestion in suggestions) {
       print('Suggestion: ${suggestion.displayName}');
     }
+
+    // Nearby POI Example
+    print('\n--- Nearby Points of Interest ---');
+    final nearbyRestaurants = await client.nearbyPOI.findNearbyRestaurants(
+      latitude: 51.5074,
+      longitude: -0.1278,
+      radius: 1000,
+      limit: 5,
+    );
+
+    for (final restaurant in nearbyRestaurants) {
+      print('Restaurant: ${restaurant.displayName}');
+      if (restaurant.distance != null) {
+        print('  Distance: ${restaurant.distance!.toStringAsFixed(0)}m');
+      }
+    }
+
+    // Timezone Example
+    print('\n--- Timezone Information ---');
+    final timezone = await client.timezone.getCurrentTimezone(
+      latitude: 51.5074,
+      longitude: -0.1278,
+    );
+
+    print('Timezone: ${timezone.timezone}');
+    print('UTC Offset: ${timezone.utcOffsetFormatted}');
+    print('Is DST: ${timezone.isDst}');
+
+    // Directions Example
+    print('\n--- Driving Directions ---');
+    final directions = await client.directions.getSimpleRoute(
+      startLatitude: 51.5074,
+      startLongitude: -0.1278,
+      endLatitude: 51.5033,
+      endLongitude: -0.1195,
+    );
+
+    if (directions.primaryRoute != null) {
+      final route = directions.primaryRoute!;
+      print('Distance: ${route.formattedDistance}');
+      print('Duration: ${route.formattedDuration}');
+
+      // Print turn-by-turn directions
+      for (final leg in route.legs) {
+        for (final step in leg.steps) {
+          final instruction = step.maneuver?.instruction ?? 'Continue';
+          print('  ${instruction} (${step.distance.toStringAsFixed(0)}m)');
+        }
+      }
+    }
+
+    // Balance Check Example
+    print('\n--- Account Balance ---');
+    final balance = await client.balance.getBalance();
+    print('Status: ${balance.status}');
+    print(
+      'Remaining Requests: ${balance.remainingRequests}/${balance.totalRequests}',
+    );
+    print('Usage: ${balance.usagePercentage.toStringAsFixed(1)}%');
+
+    if (balance.balance != null) {
+      print('Account Balance: ${balance.formattedBalance}');
+    }
+
+    // Check if account has sufficient balance
+    final hasSufficientBalance = await client.balance.hasSufficientBalance(
+      minimumRequests: 100,
+    );
+    print('Has sufficient balance (>100 requests): $hasSufficientBalance');
   } on AuthenticationException catch (e) {
     print('Authentication Error: ${e.message}');
   } on RateLimitException catch (e) {
