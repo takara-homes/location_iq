@@ -21,8 +21,8 @@ class RequestBuilder {
       'key': apiKey,
       'q': query,
       'format': format ?? ApiConfig.defaultFormat,
-      'addressdetails':
-          (addressdetails ?? ApiConfig.defaultAddressDetails).toString(),
+      'addressdetails': (addressdetails ?? ApiConfig.defaultAddressDetails)
+          .toString(),
       'limit': (limit ?? ApiConfig.defaultLimit).toString(),
       'accept-language': acceptLanguage ?? ApiConfig.defaultLanguage,
       if (countrycodes != null) 'countrycodes': countrycodes,
@@ -35,8 +35,6 @@ class RequestBuilder {
       if (jsonCallback != null) 'json_callback': jsonCallback,
     };
 
-    return Uri.parse('$baseUrl/search').replace(
-      queryParameters: queryParams,
-    );
+    return Uri.parse('$baseUrl/search').replace(queryParameters: queryParams);
   }
 }

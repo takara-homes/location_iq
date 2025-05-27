@@ -30,7 +30,11 @@ class FreeFormForwardGeocodingService extends BaseLocationIQService {
     Map<String, dynamic>? additionalOptions,
   }) async {
     // Parameter validation
-    validateStringParameter(query, 'query', maxLength: 300);
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) {
+      throw ArgumentError('query cannot be empty');
+    }
+    validateStringParameter(trimmedQuery, 'query', maxLength: 300);
     validateNumericParameter(limit, 'limit', min: 1, max: 50);
     validateNumericParameter(addressDetails, 'addressDetails', min: 0, max: 1);
 
@@ -51,7 +55,7 @@ class FreeFormForwardGeocodingService extends BaseLocationIQService {
 
     final parameters = <String, dynamic>{
       'key': apiKey,
-      'q': query.trim(),
+      'q': trimmedQuery,
       'format': 'json',
       if (limit != null) 'limit': limit,
       if (viewBox != null) 'viewbox': viewBox,

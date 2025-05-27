@@ -17,10 +17,7 @@ class BalanceService extends BaseLocationIQService {
   /// [format] - Response format (default: 'json')
   Future<BalanceResult> getBalance({String format = 'json'}) async {
     try {
-      final queryParams = {
-        'key': apiKey,
-        'format': format,
-      };
+      final queryParams = {'key': apiKey, 'format': format};
 
       final uri = buildUri('/v1/balance', queryParams);
       final response = await makeRequest(uri);

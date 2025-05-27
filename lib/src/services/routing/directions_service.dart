@@ -102,12 +102,7 @@ class DirectionsService extends BaseLocationIQService {
       throw ArgumentError('At least one coordinate pair is required');
     }
 
-    if (coordinates.length < 2) {
-      throw ArgumentError(
-        'At least two coordinate pairs are required for routing',
-      );
-    }
-
+    // First validate the format of all coordinates
     for (int i = 0; i < coordinates.length; i++) {
       final coord = coordinates[i];
       if (coord.length != 2) {
@@ -129,6 +124,13 @@ class DirectionsService extends BaseLocationIQService {
       }
     }
 
+    // Then check minimum count for routing
+    if (coordinates.length < 2) {
+      throw ArgumentError(
+        'At least two coordinate pairs are required for routing',
+      );
+    }
+
     // Format coordinates as semicolon-separated string
     final coordinatesString = coordinates
         .map((coord) => '${coord[0]},${coord[1]}')
@@ -145,7 +147,10 @@ class DirectionsService extends BaseLocationIQService {
         'annotations': annotations.toString(),
       };
 
-      final uri = buildUri('/v1/directions/$profile/$coordinatesString', queryParams);
+      final uri = buildUri(
+        '/v1/directions/$profile/$coordinatesString',
+        queryParams,
+      );
       final response = await makeRequest(uri);
 
       final jsonData = jsonDecode(response.body);

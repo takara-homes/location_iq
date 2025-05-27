@@ -16,7 +16,8 @@ class ErrorHandler {
         throw AuthenticationException('Invalid API Key: $body');
       case HttpStatus.forbidden:
         throw AuthorizationException(
-            'Request made from unauthorized domain: $body');
+          'Request made from unauthorized domain: $body',
+        );
       case HttpStatus.notFound:
         throw NotFoundException('No location found: $body');
       case HttpStatus.tooManyRequests:

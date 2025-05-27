@@ -42,6 +42,7 @@ void main() {
           "addresstype": "tourism",
           "name": "Empire State Building",
           "display_name": "Empire State Building, 350, 5th Avenue, Manhattan, New York, NY, 10118, USA",
+          "boundingbox": ["40.7479", "40.7489", "-73.9862", "-73.9852"],
           "address": {
             "house_number": "350",
             "road": "5th Avenue",
@@ -60,8 +61,8 @@ void main() {
         final result = await service.search(lat: lat, lon: lon);
 
         expect(result.displayName, contains('Empire State Building'));
-        expect(result.lat, equals('40.7484'));
-        expect(result.lon, equals('-73.9857'));
+        expect(result.lat, equals(40.7484));
+        expect(result.lon, equals(-73.9857));
         expect(result.address, isNotNull);
 
         verify(mockClient.get(any, headers: anyNamed('headers'))).called(1);
@@ -136,7 +137,23 @@ void main() {
       });
 
       test('should include all optional parameters in request', () async {
-        const responseBody = '{}';
+        const responseBody = '''{
+          "place_id": "12345",
+          "licence": "test",
+          "osm_type": "way",
+          "osm_id": "67890",
+          "lat": "40.7484",
+          "lon": "-73.9857",
+          "display_name": "Test Location",
+          "boundingbox": ["40.7479", "40.7489", "-73.9862", "-73.9852"],
+          "address": {
+            "house_number": "350",
+            "road": "5th Avenue",
+            "city": "New York",
+            "state": "NY",
+            "country": "USA"
+          }
+        }''';
         when(
           mockClient.get(any, headers: anyNamed('headers')),
         ).thenAnswer((_) async => http.Response(responseBody, 200));
@@ -190,7 +207,23 @@ void main() {
       });
 
       test('should filter out null parameters', () async {
-        const responseBody = '{}';
+        const responseBody = '''{
+          "place_id": "12345",
+          "licence": "test",
+          "osm_type": "way",
+          "osm_id": "67890",
+          "lat": "40.7484",
+          "lon": "-73.9857",
+          "display_name": "Test Location",
+          "boundingbox": ["40.7479", "40.7489", "-73.9862", "-73.9852"],
+          "address": {
+            "house_number": "350",
+            "road": "5th Avenue",
+            "city": "New York",
+            "state": "NY",
+            "country": "USA"
+          }
+        }''';
         when(
           mockClient.get(any, headers: anyNamed('headers')),
         ).thenAnswer((_) async => http.Response(responseBody, 200));

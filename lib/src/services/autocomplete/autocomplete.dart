@@ -23,7 +23,11 @@ class AutocompleteService extends BaseLocationIQService {
     Map<String, dynamic>? additionalOptions,
   }) async {
     // Validate query parameter
-    validateStringParameter(query, 'query', maxLength: 200);
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) {
+      throw ArgumentError('query cannot be empty');
+    }
+    validateStringParameter(trimmedQuery, 'query', maxLength: 200);
 
     // Validate numeric parameters
     validateNumericParameter(limit, 'limit', min: 1, max: 50);
@@ -31,7 +35,7 @@ class AutocompleteService extends BaseLocationIQService {
 
     final parameters = <String, dynamic>{
       'key': apiKey,
-      'q': query.trim(),
+      'q': trimmedQuery,
       'format': 'json',
       if (countryCode != null) 'countrycodes': countryCode,
       if (limit != null) 'limit': limit,

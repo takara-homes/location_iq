@@ -74,6 +74,8 @@ void main() {
             "addresstype": "city",
             "name": "New York",
             "display_name": "New York, NY, USA",
+            "display_place": "New York",
+            "display_address": "NY, USA",
             "boundingbox": ["40.4774", "40.9176", "-74.2591", "-73.7004"]
           }
         ]''';
@@ -86,8 +88,8 @@ void main() {
 
         expect(results, hasLength(1));
         expect(results.first.displayName, equals('New York, NY, USA'));
-        expect(results.first.lat, equals('40.7128'));
-        expect(results.first.lon, equals('-74.0060'));
+        expect(results.first.lat, equals(40.7128));
+        expect(results.first.lon, equals(-74.0060));
 
         verify(mockClient.get(any, headers: anyNamed('headers'))).called(1);
       });

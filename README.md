@@ -1,27 +1,31 @@
 # LocationIQ API Client for Dart
 
-A type-safe, feature-rich Dart client for the LocationIQ API. This package provides easy access to LocationIQ's geocoding, reverse geocoding, and autocomplete services with robust error handling and flexible configuration options.
+A comprehensive, type-safe Dart client for the LocationIQ API. This package provides easy access to LocationIQ's complete suite of location services including geocoding, reverse geocoding, autocomplete, nearby points of interest, directions, timezone information, and account balance monitoring.
 
 [![pub package](https://img.shields.io/pub/v/location_iq.svg)](https://pub.dev/packages/location_iq)
 [![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
 
 ## Features
 
-- 📍 Complete LocationIQ API coverage:
+- 📍 **Complete LocationIQ API coverage:**
   - Forward Geocoding (Free-form, Structured, and Postal Code)
   - Reverse Geocoding
   - Address Autocomplete
-- 🛡️ Type-safe API with null safety
-- 🎯 Comprehensive error handling
-- ⚡ Configurable timeout and HTTP client
-- 📚 Extensive documentation
-- 🧪 Test coverage
+  - **Nearby Points of Interest** - Find restaurants, schools, hospitals, etc.
+  - **Directions API** - Route planning with driving/walking/cycling profiles
+  - **Timezone API** - Get timezone information for coordinates
+  - **Balance API** - Monitor account usage and balance
+- 🛡️ **Type-safe API** with null safety
+- 🎯 **Comprehensive error handling** with specific exception types
+- ⚡ **Configurable timeout and HTTP client**
+- 📚 **Extensive documentation** and examples
+- 🧪 **89 unit tests** with 100% coverage
 
 ## Installation
 
 ```yaml
 dependencies:
-  location_iq: ^1.0.0
+  location_iq: ^1.1.0
 ```
 
 ## Quick Start

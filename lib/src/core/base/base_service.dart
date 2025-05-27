@@ -116,6 +116,8 @@ abstract class BaseLocationIQService {
 
       ErrorHandler.handleErrorResponse(response);
       throw UnexpectedException('Unexpected error occurred');
+    } on NetworkException catch (e) {
+      throw UnexpectedException('Network error: ${e.message}');
     } on FormatException catch (e) {
       throw UnexpectedException('Invalid response format: ${e.toString()}');
     }

@@ -54,8 +54,8 @@ void main() {
 
         expect(results, hasLength(1));
         expect(results.first.displayName, contains('Empire State Building'));
-        expect(results.first.lat, equals('40.7484'));
-        expect(results.first.lon, equals('-73.9857'));
+        expect(results.first.lat, equals(40.7484));
+        expect(results.first.lon, equals(-73.9857));
 
         verify(mockClient.get(any, headers: anyNamed('headers'))).called(1);
       });
