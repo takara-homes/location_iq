@@ -1,6 +1,6 @@
 name: location_iq
 description: A comprehensive, type-safe Dart client for the LocationIQ API with support for geocoding, reverse geocoding, autocomplete, nearby POI, directions, timezone, and account balance services.
-version: 1.1.0
+version: 1.1.1
 repository: https://github.com/takara-homes/location_iq
 homepage: https://github.com/takara-homes/location_iq
 documentation: https://github.com/takara-homes/location_iq

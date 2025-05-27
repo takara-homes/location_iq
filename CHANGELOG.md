@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-05-27
+
+### Added
+- **API Key Documentation** - Comprehensive guide on obtaining LocationIQ API keys
+  - Step-by-step registration instructions at https://locationiq.com/
+  - Information about free tier limits (60,000 requests/month, 2 requests/second)
+  - Security best practices for API key management
+  - Examples of secure API key storage using environment variables
+- **Enhanced README Documentation** - Complete feature overview with real-world examples
+  - Detailed usage examples for all 7 LocationIQ API services
+  - Platform support information (Flutter mobile/web/desktop, Dart CLI/server)
+  - Migration guide from v1.0.x to v1.1.x
+  - Comprehensive error handling documentation with exception types table
+  - Project structure visualization and architecture overview
+  - Development setup and contributing guidelines
+
+### Improved
+- **Documentation Quality** - Enhanced README with professional presentation
+  - Clear section organization with emojis for better readability
+  - Complete API reference with parameter explanations
+  - Popular POI categories reference guide
+  - Links to LocationIQ registration, dashboard, and pricing
+
 ## [1.1.0] - 2025-05-27
 
 ### Added
