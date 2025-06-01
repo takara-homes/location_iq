@@ -43,8 +43,8 @@ class LocationIQClient {
         'API key cannot contain leading or trailing whitespace',
       );
     }
-    // Basic format validation - LocationIQ keys are typically alphanumeric
-    if (!RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(apiKey)) {
+    // Basic format validation - LocationIQ keys are typically alphanumeric with periods
+    if (!RegExp(r'^[a-zA-Z0-9._-]+$').hasMatch(apiKey)) {
       throw ArgumentError('API key contains invalid characters');
     }
   }

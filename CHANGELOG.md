@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-06-01
+
+### Fixed
+- **API Key Validation** - Updated regex pattern to support LocationIQ API keys containing periods
+  - Fixed validation to allow `pk.` prefix in API keys
+  - Updated regular expression from `^[a-zA-Z0-9_-]+$` to `^[a-zA-Z0-9._-]+$`
+
+### Improved
+- **Package Description** - Shortened description to meet pub.dev requirements (60-180 characters)
+  - Optimized package description for better discoverability on pub.dev
+
 ## [1.1.1] - 2025-05-27
 
 ### Added
