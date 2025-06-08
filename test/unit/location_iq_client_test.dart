@@ -44,35 +44,5 @@ void main() {
       // Should not throw
       expect(() => client.dispose(), returnsNormally);
     });
-
-    group('API Key Validation', () {
-      test('should reject empty API key', () {
-        expect(
-          () => LocationIQClient(apiKey: ''),
-          throwsA(isA<ArgumentError>()),
-        );
-      });
-
-      test('should reject API key with whitespace', () {
-        expect(
-          () => LocationIQClient(apiKey: ' test_key '),
-          throwsA(isA<ArgumentError>()),
-        );
-      });
-
-      test('should reject API key with invalid characters', () {
-        expect(
-          () => LocationIQClient(apiKey: 'test@key!'),
-          throwsA(isA<ArgumentError>()),
-        );
-      });
-
-      test('should accept valid API key', () {
-        expect(
-          () => LocationIQClient(apiKey: 'valid_api_key_123'),
-          returnsNormally,
-        );
-      });
-    });
   });
 }

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-06-08
+
+### Removed
+- **API Key Validation in Base Service** - Removed API key validation from BaseLocationIQService
+  - Completely eliminated all API key validation across the entire package
+  - Removed `_validateApiKey` method from base service class
+  - All services now accept any API key format without client-side validation
+
 ## [1.1.3] - 2025-06-08
 
 ### Removed

@@ -25,35 +25,25 @@ void main() {
     });
 
     group('Constructor validation', () {
-      test('should throw ArgumentError for empty API key', () {
+      // API key validation has been removed - all API keys are now accepted
+      test('should accept any API key format', () {
         expect(
           () => AutocompleteService(apiKey: '', baseUrl: testBaseUrl),
-          throwsArgumentError,
+          returnsNormally,
         );
-      });
-
-      test('should throw ArgumentError for API key with whitespace', () {
         expect(
           () => AutocompleteService(
             apiKey: ' invalid_key ',
             baseUrl: testBaseUrl,
           ),
-          throwsArgumentError,
+          returnsNormally,
+        );
+        expect(
+          () =>
+              AutocompleteService(apiKey: 'invalid@key#', baseUrl: testBaseUrl),
+          returnsNormally,
         );
       });
-
-      test(
-        'should throw ArgumentError for API key with invalid characters',
-        () {
-          expect(
-            () => AutocompleteService(
-              apiKey: 'invalid@key#',
-              baseUrl: testBaseUrl,
-            ),
-            throwsArgumentError,
-          );
-        },
-      );
     });
 
     group('suggest method', () {

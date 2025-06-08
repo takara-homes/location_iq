@@ -20,25 +20,7 @@ abstract class BaseLocationIQService {
   }) : _httpClient = LocationIQHttpClient(
          client: httpClient,
          timeout: timeout ?? Duration(milliseconds: ApiConfig.defaultTimeout),
-       ) {
-    _validateApiKey(apiKey);
-  }
-
-  /// Validates the API key format
-  void _validateApiKey(String apiKey) {
-    if (apiKey.isEmpty) {
-      throw ArgumentError('API key cannot be empty');
-    }
-    if (apiKey.trim() != apiKey) {
-      throw ArgumentError(
-        'API key cannot contain leading or trailing whitespace',
-      );
-    }
-    // Basic format validation - LocationIQ keys are typically alphanumeric
-    if (!RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(apiKey)) {
-      throw ArgumentError('API key contains invalid characters');
-    }
-  }
+       );
 
   /// Validates numeric parameters
   void validateNumericParameter(

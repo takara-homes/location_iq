@@ -18,24 +18,19 @@ void main() {
     });
 
     group('API Key Validation', () {
-      test('should reject empty API key', () {
+      // API key validation has been removed - all API keys are now accepted
+      test('should accept any API key format', () {
         expect(
           () => TestService(apiKey: '', baseUrl: 'https://test.com'),
-          throwsA(isA<ArgumentError>()),
+          returnsNormally,
         );
-      });
-
-      test('should reject API key with whitespace', () {
         expect(
           () => TestService(apiKey: ' test_key ', baseUrl: 'https://test.com'),
-          throwsA(isA<ArgumentError>()),
+          returnsNormally,
         );
-      });
-
-      test('should reject API key with invalid characters', () {
         expect(
           () => TestService(apiKey: 'test@key!', baseUrl: 'https://test.com'),
-          throwsA(isA<ArgumentError>()),
+          returnsNormally,
         );
       });
     });
